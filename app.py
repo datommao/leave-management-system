@@ -33,16 +33,18 @@ def get_db_connection():
     try:
         if DATABASE_URL:
             # 生產環境：使用 PostgreSQL
-            import psycopg2
-            conn = psycopg2.connect(DATABASE_URL, sslmode='require')
-            return conn
+            try:
+                import psycopg2
+                conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+                return conn
+            except ImportError:
+                logger.error("❌ psycopg2 未安裝，請檢查 requirements.txt")
+                logger.error("💡 嘗試重新部署或檢查構建日誌")
+                return None
         else:
             # 開發環境：使用本地 JSON 文件
             logger.warning("⚠️ 未設定 DATABASE_URL，使用本地文件儲存")
             return None
-    except ImportError:
-        logger.error("❌ psycopg2 未安裝，無法連接數據庫")
-        return None
     except Exception as e:
         logger.error(f"❌ 數據庫連接失敗: {e}")
         return None
