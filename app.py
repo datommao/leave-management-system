@@ -344,10 +344,13 @@ def delete_leave_data(data_id):
 @app.route('/health')
 def health_check():
     """健康檢查"""
+    db_status = "connected" if get_db_connection() else "local"
     return jsonify({
         'status': 'healthy',
         'timestamp': datetime.now().isoformat(),
-        'version': '2.0.0'
+        'version': '3.0.0',
+        'database': db_status,
+        'storage': 'postgresql' if DATABASE_URL else 'json'
     })
 
 @app.errorhandler(404)
@@ -368,12 +371,15 @@ if __name__ == '__main__':
     print(f"🚀 請假管理系統啟動中...")
     print(f"📍 Host: {HOST}")
     print(f"🔌 Port: {PORT}")
+    print(f"🗄️ 數據庫: {'PostgreSQL' if DATABASE_URL else 'Local JSON'}")
     print(f"🌐 環境: {'Production' if os.environ.get('PORT') else 'Development'}")
     
-    # 確保數據文件存在
-    if not os.path.exists(DATA_FILE):
-        print(f"📁 初始化數據文件: {DATA_FILE}")
-        save_data([])
+    # 初始化數據庫
+    if DATABASE_URL:
+        print("� 正在連接數據庫...")
+        init_database()
+    else:
+        print("📁 使用本地文件儲存")
     
     # 啟動 Flask 應用
     app.run(host=HOST, port=PORT, debug=False)
