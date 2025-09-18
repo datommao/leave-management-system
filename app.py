@@ -259,6 +259,10 @@ def get_data():
 def save_leave_data():
     """儲存請假數據"""
     try:
+        # 記錄請求詳情（用於除錯）
+        logger.info(f"📥 收到 POST 請求，Content-Type: {request.content_type}")
+        logger.info(f"📥 請求大小: {request.content_length} bytes")
+        
         # 檢查請求大小
         if request.content_length and request.content_length > 1024 * 1024:  # 1MB
             return jsonify({
@@ -268,43 +272,47 @@ def save_leave_data():
         
         request_data = request.get_json()
         if not request_data:
+            logger.error("❌ 無效的JSON數據")
             return jsonify({
                 'status': 'error',
                 'message': '無效的JSON數據'
             }), 400
         
+        logger.info(f"📋 收到請假申請: {request_data.get('name')} - {request_data.get('type')}")
+        
         # 驗證數據
         is_valid, message = validate_leave_data(request_data)
         if not is_valid:
+            logger.error(f"❌ 數據驗證失敗: {message}")
             return jsonify({
                 'status': 'error',
                 'message': message
             }), 400
         
-        # 載入現有數據
-        data = load_data()
-        
         # 添加時間戳和ID
         request_data['id'] = datetime.now().strftime('%Y%m%d_%H%M%S_%f')[:-3]
         request_data['createTime'] = datetime.now().isoformat()
         
-        # 添加新數據
-        data.append(request_data)
+        logger.info(f"💾 準備儲存記錄 ID: {request_data['id']}")
         
-        # 儲存數據
-        if save_data(data):
+        # 儲存數據（單筆記錄）
+        if save_data(request_data):
+            logger.info(f"✅ 記錄儲存成功: {request_data['id']}")
             return jsonify({
                 'status': 'success',
                 'message': '請假數據已儲存',
-                'id': request_data['id']
+                'id': request_data['id'],
+                'storage_type': 'postgresql' if DATABASE_URL else 'json'
             })
         else:
+            logger.error(f"❌ 記錄儲存失敗: {request_data['id']}")
             return jsonify({
                 'status': 'error',
                 'message': '儲存失敗'
             }), 500
             
     except Exception as e:
+        logger.error(f"❌ 伺服器錯誤: {str(e)}")
         return jsonify({
             'status': 'error',
             'message': f'伺服器錯誤: {str(e)}'
@@ -354,6 +362,92 @@ def health_check():
         'database': db_status,
         'storage': 'postgresql' if DATABASE_URL else 'json'
     })
+
+@app.route('/debug/database')
+def debug_database():
+    """檢查數據庫內容 - 僅用於排查問題"""
+    try:
+        if not DATABASE_URL:
+            return jsonify({
+                'status': 'error',
+                'message': '未設定 DATABASE_URL，使用本地 JSON 儲存',
+                'storage': 'json'
+            })
+        
+        conn = get_db_connection()
+        if not conn:
+            return jsonify({
+                'status': 'error',
+                'message': '無法連接數據庫',
+                'storage': 'json'
+            })
+        
+        try:
+            import psycopg2.extras
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+                # 檢查表是否存在
+                cur.execute("""
+                    SELECT EXISTS (
+                        SELECT FROM information_schema.tables 
+                        WHERE table_name = 'leave_records'
+                    );
+                """)
+                table_exists = cur.fetchone()[0]
+                
+                if not table_exists:
+                    return jsonify({
+                        'status': 'warning',
+                        'message': 'leave_records 表不存在',
+                        'table_exists': False,
+                        'records_count': 0,
+                        'records': []
+                    })
+                
+                # 獲取記錄數量
+                cur.execute("SELECT COUNT(*) FROM leave_records")
+                count = cur.fetchone()[0]
+                
+                # 獲取最近 10 筆記錄
+                cur.execute("""
+                    SELECT id, name, start_date, end_date, reason, type, create_time
+                    FROM leave_records 
+                    ORDER BY create_time DESC 
+                    LIMIT 10
+                """)
+                records = cur.fetchall()
+                
+                # 轉換為可序列化的格式
+                records_list = []
+                for record in records:
+                    records_list.append({
+                        'id': record['id'],
+                        'name': record['name'],
+                        'start_date': record['start_date'].strftime('%Y-%m-%d') if record['start_date'] else None,
+                        'end_date': record['end_date'].strftime('%Y-%m-%d') if record['end_date'] else None,
+                        'reason': record['reason'],
+                        'type': record['type'],
+                        'create_time': record['create_time'].isoformat() if record['create_time'] else None
+                    })
+                
+                return jsonify({
+                    'status': 'success',
+                    'message': f'數據庫連接正常，找到 {count} 筆記錄',
+                    'table_exists': True,
+                    'records_count': count,
+                    'records': records_list,
+                    'database_url_set': bool(DATABASE_URL),
+                    'storage': 'postgresql'
+                })
+                
+        finally:
+            conn.close()
+            
+    except Exception as e:
+        return jsonify({
+            'status': 'error',
+            'message': f'數據庫檢查失敗: {str(e)}',
+            'error_type': type(e).__name__
+        }), 500
 
 @app.errorhandler(404)
 def not_found(error):
