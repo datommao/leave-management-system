@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <!-- MIT License - LeaveSystem Project 2024 -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://apis.google.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; font-src 'self' https://cdnjs.cloudflare.com; connect-src 'self';">
+    <title>請假板板 - Leave Management System</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="i18n.js"></script>
+</head>
+<body>
+    <header>
+        <div class="header-top">
+            <h1><i class="fas fa-calendar-alt"></i> <span data-key="title">請假板板</span></h1>
+            <div class="language-switcher">
+                <button id="langBtn" class="lang-btn">
+                    <i class="fas fa-globe"></i> EN
+                </button>
+            </div>
+        </div>
+        <div class="server-status" id="serverStatus">
+            <i class="fas fa-server"></i> <span data-key="serverRunning">本地伺服器運行中</span>
+            <span style="margin-left: 1rem; font-size: 0.8rem;" id="lastUpdate">
+                <i class="fas fa-sync-alt"></i> <span data-key="autoUpdate">每30秒自動更新</span>
+            </span>
+        </div>
+        <nav>
+            <button id="calendarViewBtn" class="nav-btn active">
+                <i class="fas fa-calendar"></i> <span data-key="calendarView">行事曆檢視</span>
+            </button>
+            <button id="submitLeaveBtn" class="nav-btn">
+                <i class="fas fa-plus"></i> <span data-key="submitLeave">登記請假</span>
+            </button>
+            <button id="manageBtn" class="nav-btn manage-btn">
+                <i class="fas fa-edit"></i> <span data-key="manageLeave">管理請假</span>
+            </button>
+        </nav>
+    </header>
+
+    <main>
+        <!-- 行事曆檢視 -->
+        <section id="calendarView" class="view active">
+            <div class="calendar-header">
+                <button id="prevMonth" class="nav-button">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <h2 id="currentMonth">2025年7月</h2>
+                <button id="nextMonth" class="nav-button">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+            
+            <div class="legend">
+                <div class="legend-item">
+                    <span class="legend-color" style="background: #9ca3af;"></span>
+                    <span data-key="pastLeave">過去請假</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color" style="background: #f59e0b;"></span>
+                    <span data-key="currentLeave">休假中</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color" style="background: #3b82f6;"></span>
+                    <span data-key="futureLeave">未來請假</span>
+                </div>
+            </div>
+
+            <div id="calendar" class="calendar-grid">
+                <!-- 日曆會由 JavaScript 動態生成 -->
+            </div>
+
+            <div class="leave-list">
+                <h3>本月請假人員</h3>
+                <div id="leaveDetails" class="leave-details">
+                    <!-- 請假人員會由 JavaScript 動態生成 -->
+                </div>
+            </div>
+        </section>
+
+        <!-- 請假申請表單 -->
+        <section id="submitLeaveView" class="view">
+            <div class="form-container">
+                <h2><i class="fas fa-user-plus"></i> <span data-key="submitLeaveTitle">登記請假</span></h2>
+                <p style="text-align: center; color: #6b7280; margin-bottom: 1rem;">
+                    💡 <span data-key="submitLeaveHint">可以登記過去、現在或未來的請假記錄</span>
+                </p>
+                
+                <!-- 良心提示 -->
+                <div style="background: #fef3c7; border: 1px solid #f59e0b; border-radius: 8px; padding: 1rem; margin-bottom: 2rem;">
+                    <div style="display: flex; align-items: center; color: #92400e; font-weight: 500; margin-bottom: 0.5rem;">
+                        <i class="fas fa-exclamation-triangle" style="margin-right: 0.5rem;"></i>
+                        <span data-key="reminder">良心提醒</span>
+                    </div>
+                    <ul style="color: #92400e; font-size: 0.9rem; margin: 0; padding-left: 1.2rem; line-height: 1.5;">
+                        <li data-key="reminderText1">此為<strong>非正式</strong>請假系統，僅供團隊內部參考使用</li>
+                        <li data-key="reminderText2">請<strong>誠實</strong>填寫自己的請假記錄</li>
+                        <li data-key="reminderText3">請勿隨意新增他人的假期資料</li>
+                        <li data-key="reminderText4">正式請假仍需依公司規定辦理</li>
+                    </ul>
+                </div>
+                
+                <form id="leaveForm">
+                    <div class="form-group">
+                        <label for="employeeName" data-key="nameLabel">姓名：</label>
+                        <input type="text" id="employeeName" name="employeeName" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="startDate" data-key="startDateLabel">開始日期：</label>
+                        <input type="date" id="startDate" name="startDate" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="endDate" data-key="endDateLabel">結束日期：</label>
+                        <input type="date" id="endDate" name="endDate" required>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="submit-btn">
+                            <i class="fas fa-paper-plane"></i> <span data-key="submitBtn">提交申請</span>
+                        </button>
+                        <button type="reset" class="reset-btn">
+                            <i class="fas fa-undo"></i> <span data-key="resetBtn">重設表單</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- 管理請假頁面 -->
+        <section id="manageLeaveView" class="view">
+            <div class="form-container">
+                <h2><i class="fas fa-edit"></i> <span data-key="manageLeaveTitle">管理請假</span></h2>
+                
+                <!-- 清理重複記錄按鈕 -->
+                <div style="text-align: center; margin-bottom: 1rem;">
+                    <button id="cleanupDuplicatesBtn" class="btn-cleanup" style="background: #dc2626; color: white; padding: 0.5rem 1rem; border: none; border-radius: 6px; cursor: pointer; font-size: 0.9rem;">
+                        <i class="fas fa-broom"></i> <span data-key="cleanupBtn">清理重複記錄</span>
+                    </button>
+                </div>
+                
+                <!-- 良心提示 -->
+                <div style="background: #fef2f2; border: 1px solid #f87171; border-radius: 8px; padding: 1rem; margin-bottom: 2rem;">
+                    <div style="display: flex; align-items: center; color: #b91c1c; font-weight: 500; margin-bottom: 0.5rem;">
+                        <i class="fas fa-shield-alt" style="margin-right: 0.5rem;"></i>
+                        重要提醒
+                    </div>
+                    <ul style="color: #b91c1c; font-size: 0.9rem; margin: 0; padding-left: 1.2rem; line-height: 1.5;">
+                        <li>此為<strong>非正式</strong>請假系統，僅供團隊內部參考使用</li>
+                        <li>請<strong>僅刪除自己</strong>的請假記錄</li>
+                        <li>請勿任意刪除他人的假期資料</li>
+                        <li>刪除操作<strong>無法復原</strong>，請再三確認</li>
+                    </ul>
+                </div>
+                
+                <div class="manage-content">
+                    <p>點擊下方的請假記錄可以刪除：</p>
+                    <div id="manageLeaveList" class="manage-leave-list">
+                        <!-- 請假管理列表會由 JavaScript 動態生成 -->
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 確認刪除模態視窗 -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <span class="close-delete">&times;</span>
+            <h3>確認刪除</h3>
+            <div class="delete-content">
+                <p>確定要刪除這筆請假記錄嗎？</p>
+                <div id="deleteLeaveInfo" class="delete-info">
+                    <!-- 要刪除的請假資訊 -->
+                </div>
+                <div class="delete-actions">
+                    <button id="confirmDeleteBtn" class="delete-btn">
+                        <i class="fas fa-trash"></i> 確認刪除
+                    </button>
+                    <button id="cancelDeleteBtn" class="cancel-btn">
+                        <i class="fas fa-times"></i> 取消
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 模態視窗 - 顯示請假詳情 -->
+    <div id="leaveModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3 id="modalTitle">請假資訊</h3>
+            <div id="modalBody">
+                <!-- 請假資訊會由 JavaScript 動態生成 -->
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js?v=20250806-enhanced"></script>
+</body>
+</html>
