@@ -1,50 +1,58 @@
 [
   {
-    "id": 1754470643732,
-    "name": "Jackie",
+    "id": 1758174287188,
+    "name": "Stacy",
     "type": "leave",
-    "startDate": "2025-08-08",
-    "endDate": "2025-08-08",
-    "submitDate": "2025-08-06"
+    "startDate": "2025-09-19",
+    "endDate": "2025-09-19",
+    "submitDate": "2025-09-18"
   },
   {
-    "id": 1754470675308,
-    "name": "cute ross",
+    "id": 1758174464910,
+    "name": "Kelly",
     "type": "leave",
-    "startDate": "2025-08-03",
-    "endDate": "2025-08-04",
-    "submitDate": "2025-08-06"
+    "startDate": "2025-10-03",
+    "endDate": "2025-10-10",
+    "submitDate": "2025-09-18"
   },
   {
-    "id": 1754495865687,
-    "name": "躺一年",
+    "id": 1758174510817,
+    "name": "Mo",
     "type": "leave",
-    "startDate": "2026-01-01",
-    "endDate": "2026-12-31",
-    "submitDate": "2025-08-06"
+    "startDate": "2025-10-08",
+    "endDate": "2025-10-15",
+    "submitDate": "2025-09-18"
   },
   {
-    "id": 1754853144195,
-    "name": "湯姆",
+    "id": 1758174580942,
+    "name": "Jack C",
+    "type": "leave",
+    "startDate": "2025-10-08",
+    "endDate": "2025-10-14",
+    "submitDate": "2025-09-18"
+  },
+  {
+    "id": 1758175819964,
+    "name": "Tom",
     "type": "leave",
     "startDate": "2025-10-09",
     "endDate": "2025-10-14",
-    "submitDate": "2025-08-11"
+    "submitDate": "2025-09-18"
   },
   {
-    "id": 1754909656912,
-    "name": "masa",
+    "id": 1758175892794,
+    "name": "Jay",
     "type": "leave",
-    "startDate": "2025-08-28",
-    "endDate": "2025-08-28",
-    "submitDate": "2025-08-11"
+    "startDate": "2025-10-08",
+    "endDate": "2025-10-14",
+    "submitDate": "2025-09-18"
   },
   {
-    "id": 1755187662125,
-    "name": "湯姆",
+    "id": 1758175926763,
+    "name": "Tom",
     "type": "leave",
     "startDate": "2025-10-24",
     "endDate": "2025-11-09",
-    "submitDate": "2025-08-15"
+    "submitDate": "2025-09-18"
   }
 ]
