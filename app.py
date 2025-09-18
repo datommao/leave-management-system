@@ -12,8 +12,6 @@ import json
 import threading
 from datetime import datetime
 from flask import Flask, request, jsonify, send_from_directory, send_file
-import psycopg2
-from psycopg2.extras import RealDictCursor
 import logging
 
 app = Flask(__name__)
@@ -27,7 +25,7 @@ PORT = int(os.environ.get('PORT', 10000))
 HOST = os.environ.get('HOST', '0.0.0.0')
 DATABASE_URL = os.environ.get('DATABASE_URL')
 
-# 數據庫連接池
+# 數據庫連接
 data_lock = threading.Lock()
 
 def get_db_connection():
@@ -35,19 +33,25 @@ def get_db_connection():
     try:
         if DATABASE_URL:
             # 生產環境：使用 PostgreSQL
+            import psycopg2
             conn = psycopg2.connect(DATABASE_URL, sslmode='require')
             return conn
         else:
             # 開發環境：使用本地 JSON 文件
+            logger.warning("⚠️ 未設定 DATABASE_URL，使用本地文件儲存")
             return None
+    except ImportError:
+        logger.error("❌ psycopg2 未安裝，無法連接數據庫")
+        return None
     except Exception as e:
-        logger.error(f"數據庫連接失敗: {e}")
+        logger.error(f"❌ 數據庫連接失敗: {e}")
         return None
 
 def init_database():
     """初始化數據庫表"""
     if not DATABASE_URL:
-        return  # 本地環境跳過
+        logger.info("📁 使用本地文件儲存模式")
+        return
     
     try:
         conn = get_db_connection()
@@ -86,7 +90,8 @@ def load_data():
             # 從 PostgreSQL 載入
             conn = get_db_connection()
             if conn:
-                with conn.cursor(cursor_factory=RealDictCursor) as cur:
+                import psycopg2.extras
+                with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
                     cur.execute('''
                         SELECT id, name, start_date, end_date, reason, type, 
                                create_time, data
@@ -194,44 +199,6 @@ def save_data(record):
     except Exception as e:
         logger.error(f"❌ 儲存數據失敗: {e}")
         return False
-
-def delete_data(record_id):
-    """刪除請假數據"""
-    try:
-        with data_lock:
-            if DATABASE_URL:
-                # 從 PostgreSQL 刪除
-                conn = get_db_connection()
-                if conn:
-                    with conn.cursor() as cur:
-                        cur.execute('DELETE FROM leave_records WHERE id = %s', (record_id,))
-                        affected_rows = cur.rowcount
-                        conn.commit()
-                    conn.close()
-                    
-                    if affected_rows > 0:
-                        logger.info(f"✅ 已從數據庫刪除記錄: {record_id}")
-                        return True
-                    else:
-                        logger.warning(f"⚠️ 找不到要刪除的記錄: {record_id}")
-                        return False
-            else:
-                # 本地環境：從 JSON 刪除
-                data = load_data()
-                original_count = len(data)
-                data = [item for item in data if item.get('id') != record_id]
-                
-                if len(data) < original_count:
-                    with open('data.json', 'w', encoding='utf-8') as f:
-                        json.dump(data, f, ensure_ascii=False, indent=2)
-                    logger.info(f"✅ 已從本地文件刪除記錄: {record_id}")
-                    return True
-                else:
-                    logger.warning(f"⚠️ 找不到要刪除的記錄: {record_id}")
-                    return False
-                    
-    except Exception as e:
-        logger.error(f"❌ 刪除數據失敗: {e}")
         return False
 
 def validate_leave_data(data):
@@ -278,8 +245,7 @@ def get_data():
             'status': 'success',
             'data': data,
             'count': len(data),
-            'timestamp': datetime.now().isoformat(),
-            'source': 'database' if DATABASE_URL else 'local'
+            'timestamp': datetime.now().isoformat()
         })
     except Exception as e:
         return jsonify({
@@ -313,17 +279,22 @@ def save_leave_data():
                 'message': message
             }), 400
         
+        # 載入現有數據
+        data = load_data()
+        
         # 添加時間戳和ID
         request_data['id'] = datetime.now().strftime('%Y%m%d_%H%M%S_%f')[:-3]
         request_data['createTime'] = datetime.now().isoformat()
         
+        # 添加新數據
+        data.append(request_data)
+        
         # 儲存數據
-        if save_data(request_data):
+        if save_data(data):
             return jsonify({
                 'status': 'success',
                 'message': '請假數據已儲存',
-                'id': request_data['id'],
-                'storage': 'database' if DATABASE_URL else 'local'
+                'id': request_data['id']
             })
         else:
             return jsonify({
@@ -341,12 +312,23 @@ def save_leave_data():
 def delete_leave_data(data_id):
     """刪除請假數據"""
     try:
-        if delete_data(data_id):
-            return jsonify({
-                'status': 'success',
-                'message': '數據已刪除',
-                'storage': 'database' if DATABASE_URL else 'local'
-            })
+        data = load_data()
+        original_count = len(data)
+        
+        # 過濾掉要刪除的項目
+        data = [item for item in data if item.get('id') != data_id]
+        
+        if len(data) < original_count:
+            if save_data(data):
+                return jsonify({
+                    'status': 'success',
+                    'message': '數據已刪除'
+                })
+            else:
+                return jsonify({
+                    'status': 'error',
+                    'message': '刪除失敗'
+                }), 500
         else:
             return jsonify({
                 'status': 'error',
@@ -362,13 +344,10 @@ def delete_leave_data(data_id):
 @app.route('/health')
 def health_check():
     """健康檢查"""
-    db_status = "connected" if get_db_connection() else "local"
     return jsonify({
         'status': 'healthy',
         'timestamp': datetime.now().isoformat(),
-        'version': '3.0.0',
-        'database': db_status,
-        'storage': 'postgresql' if DATABASE_URL else 'json'
+        'version': '2.0.0'
     })
 
 @app.errorhandler(404)
@@ -389,15 +368,12 @@ if __name__ == '__main__':
     print(f"🚀 請假管理系統啟動中...")
     print(f"📍 Host: {HOST}")
     print(f"🔌 Port: {PORT}")
-    print(f"🗄️ 數據庫: {'PostgreSQL' if DATABASE_URL else 'Local JSON'}")
     print(f"🌐 環境: {'Production' if os.environ.get('PORT') else 'Development'}")
     
-    # 初始化數據庫
-    if DATABASE_URL:
-        print("🔗 正在連接數據庫...")
-        init_database()
-    else:
-        print("📁 使用本地文件儲存")
+    # 確保數據文件存在
+    if not os.path.exists(DATA_FILE):
+        print(f"📁 初始化數據文件: {DATA_FILE}")
+        save_data([])
     
     # 啟動 Flask 應用
     app.run(host=HOST, port=PORT, debug=False)
