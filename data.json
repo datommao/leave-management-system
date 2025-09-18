@@ -1,26 +1,50 @@
 [
   {
-    "id": 1000000001,
-    "name": "員工A",
+    "id": 1754470643732,
+    "name": "Jackie",
     "type": "leave",
-    "startDate": "2025-09-20",
-    "endDate": "2025-09-20",
-    "submitDate": "2025-09-18"
+    "startDate": "2025-08-08",
+    "endDate": "2025-08-08",
+    "submitDate": "2025-08-06"
   },
   {
-    "id": 1000000002,
-    "name": "Employee B",
-    "type": "leave", 
-    "startDate": "2025-09-25",
-    "endDate": "2025-09-26",
-    "submitDate": "2025-09-18"
+    "id": 1754470675308,
+    "name": "cute ross",
+    "type": "leave",
+    "startDate": "2025-08-03",
+    "endDate": "2025-08-04",
+    "submitDate": "2025-08-06"
   },
   {
-    "id": 1000000003,
-    "name": "測試用戶",
+    "id": 1754495865687,
+    "name": "躺一年",
     "type": "leave",
-    "startDate": "2025-10-01",
-    "endDate": "2025-10-03",
-    "submitDate": "2025-09-18"
+    "startDate": "2026-01-01",
+    "endDate": "2026-12-31",
+    "submitDate": "2025-08-06"
+  },
+  {
+    "id": 1754853144195,
+    "name": "湯姆",
+    "type": "leave",
+    "startDate": "2025-10-09",
+    "endDate": "2025-10-14",
+    "submitDate": "2025-08-11"
+  },
+  {
+    "id": 1754909656912,
+    "name": "masa",
+    "type": "leave",
+    "startDate": "2025-08-28",
+    "endDate": "2025-08-28",
+    "submitDate": "2025-08-11"
+  },
+  {
+    "id": 1755187662125,
+    "name": "湯姆",
+    "type": "leave",
+    "startDate": "2025-10-24",
+    "endDate": "2025-11-09",
+    "submitDate": "2025-08-15"
   }
 ]
