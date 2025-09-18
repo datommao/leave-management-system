@@ -1,0 +1,808 @@
+/* 請假管理系統樣式 - Leave Management System Styles
+ * MIT License - LeaveSystem Project 2024
+ */
+
+/* 全域樣式 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    color: #333;
+}
+
+/* 標題區域 */
+header {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 1rem 2rem;
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+/* 標題頂部區域 */
+.header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+/* 語言切換按鈕 */
+.language-switcher {
+    position: static;
+    z-index: 101;
+}
+
+.lang-btn {
+    padding: 0.5rem 1rem;
+    border: 2px solid #4f46e5;
+    border-radius: 20px;
+    background: white;
+    color: #4f46e5;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    font-size: 0.9rem;
+    min-width: 60px;
+}
+
+.lang-btn:hover {
+    background: #4f46e5;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
+}
+
+.lang-btn i {
+    margin-right: 0.3rem;
+}
+
+.sync-status {
+    font-size: 0.9rem;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.server-status {
+    font-size: 0.9rem;
+    color: #10b981;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+header h1 {
+    color: #4f46e5;
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+header h1 i {
+    margin-right: 0.5rem;
+}
+
+nav {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.nav-btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 25px;
+    background: #f8f9ff;
+    color: #4f46e5;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    border: 2px solid transparent;
+}
+
+.nav-btn:hover {
+    background: #4f46e5;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
+}
+
+.nav-btn.active {
+    background: #4f46e5;
+    color: white;
+    box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
+}
+
+.manage-btn {
+    background: #f59e0b !important;
+    color: white !important;
+}
+
+.manage-btn:hover {
+    background: #d97706 !important;
+}
+
+.nav-btn i {
+    margin-right: 0.5rem;
+}
+
+/* 主要內容區域 */
+main {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 2rem;
+}
+
+.view {
+    display: none;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    animation: fadeIn 0.5s ease;
+}
+
+.view.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(100px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideOut {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(100px);
+    }
+}
+
+/* 行事曆樣式 */
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.calendar-header h2 {
+    color: #4f46e5;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.nav-button {
+    background: #4f46e5;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.nav-button:hover {
+    background: #3730a3;
+    transform: scale(1.1);
+}
+
+/* 圖例 */
+.legend {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.legend-color {
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+}
+
+.legend-color.leave { background: #ef4444; }
+
+/* 日曆網格 */
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 1px;
+    background: #e5e7eb;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+
+.calendar-day {
+    background: white;
+    padding: 1rem;
+    min-height: 120px;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.calendar-day:hover {
+    background: #f8f9ff;
+    transform: scale(1.02);
+}
+
+.calendar-day.other-month {
+    background: #f9fafb;
+    color: #9ca3af;
+}
+
+.calendar-day.today {
+    background: #eff6ff;
+    border: 2px solid #4f46e5;
+}
+
+.day-header {
+    background: #4f46e5;
+    color: white;
+    padding: 0.5rem;
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.day-number {
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    color: #374151;
+}
+
+.leave-item {
+    background: #ef4444;
+    color: white;
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    margin-bottom: 0.2rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.leave-item:hover {
+    transform: scale(1.05);
+}
+
+.leave-item.leave { background: #ef4444; }
+.leave-item.past-leave { 
+    background: #9ca3af; 
+    opacity: 0.8;
+}
+.leave-item.current-leave { 
+    background: #f59e0b; 
+    animation: pulse 2s infinite;
+}
+.leave-item.future-leave { 
+    background: #3b82f6; 
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { opacity: 1; }
+}
+
+/* 請假詳情 */
+.leave-list h3 {
+    color: #4f46e5;
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+.leave-details {
+    display: grid;
+    gap: 1rem;
+}
+
+.leave-detail-item {
+    background: #f8f9ff;
+    padding: 1rem;
+    border-radius: 10px;
+    border-left: 4px solid #4f46e5;
+    transition: transform 0.3s ease;
+}
+
+.leave-detail-item:hover {
+    transform: translateX(5px);
+}
+
+.leave-detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.leave-detail-name {
+    font-weight: 600;
+    color: #374151;
+}
+
+.leave-detail-type {
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    color: white;
+}
+
+.leave-detail-dates {
+    color: #6b7280;
+    font-size: 0.9rem;
+}
+
+/* 表單樣式 */
+.form-container {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.form-container h2 {
+    color: #4f46e5;
+    margin-bottom: 2rem;
+    text-align: center;
+    font-weight: 600;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #374151;
+    font-weight: 500;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+/* ✅ 新增：日期驗證錯誤樣式 */
+.form-group input.date-error {
+    border-color: #dc2626;
+    background-color: #fef2f2;
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+
+.form-group input.date-error:focus {
+    border-color: #dc2626;
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.2);
+}
+
+.date-validation-message {
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 2rem;
+}
+
+.submit-btn,
+.reset-btn {
+    padding: 0.75rem 2rem;
+    border: none;
+    border-radius: 25px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.submit-btn {
+    background: #4f46e5;
+    color: white;
+}
+
+.submit-btn:hover {
+    background: #3730a3;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
+}
+
+.reset-btn {
+    background: #6b7280;
+    color: white;
+}
+
+.reset-btn:hover {
+    background: #4b5563;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(107, 114, 128, 0.3);
+}
+
+/* 模態視窗 */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    background-color: white;
+    margin: 15% auto;
+    padding: 2rem;
+    border-radius: 20px;
+    width: 80%;
+    max-width: 500px;
+    position: relative;
+    animation: modalSlideIn 0.3s ease;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    position: absolute;
+    right: 1rem;
+    top: 1rem;
+    cursor: pointer;
+}
+
+.close:hover,
+.close:focus,
+.close-setup:hover,
+.close-setup:focus {
+    color: #333;
+}
+
+.close-setup {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    position: absolute;
+    right: 1rem;
+    top: 1rem;
+    cursor: pointer;
+}
+
+.setup-content {
+    line-height: 1.6;
+}
+
+.setup-step {
+    margin: 1.5rem 0;
+    padding: 1rem;
+    background: #f8f9ff;
+    border-radius: 8px;
+    border-left: 4px solid #4f46e5;
+}
+
+.setup-step h4 {
+    color: #4f46e5;
+    margin-bottom: 0.5rem;
+}
+
+.setup-step p {
+    margin: 0.5rem 0;
+    color: #374151;
+}
+
+.setup-step a {
+    color: #4f46e5;
+    text-decoration: none;
+}
+
+.setup-step a:hover {
+    text-decoration: underline;
+}
+
+/* 管理請假樣式 */
+.manage-content {
+    text-align: center;
+}
+
+.manage-leave-list {
+    margin-top: 2rem;
+    display: grid;
+    gap: 1rem;
+}
+
+.manage-leave-item {
+    background: #f8f9ff;
+    padding: 1rem;
+    border-radius: 10px;
+    border-left: 4px solid #f59e0b;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: left;
+}
+
+.manage-leave-item:hover {
+    background: #fef3c7;
+    transform: translateX(5px);
+    border-left-color: #d97706;
+}
+
+.manage-leave-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.manage-leave-name {
+    font-weight: 600;
+    color: #374151;
+}
+
+.manage-leave-dates {
+    color: #6b7280;
+    font-size: 0.9rem;
+}
+
+.delete-btn {
+    background: #ef4444;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    margin-right: 1rem;
+    transition: all 0.3s ease;
+}
+
+.delete-btn:hover {
+    background: #dc2626;
+    transform: translateY(-2px);
+}
+
+.cancel-btn {
+    background: #6b7280;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.cancel-btn:hover {
+    background: #4b5563;
+    transform: translateY(-2px);
+}
+
+.delete-actions {
+    display: flex;
+    justify-content: center;
+    margin-top: 1.5rem;
+}
+
+.delete-info {
+    background: #fef2f2;
+    padding: 1rem;
+    border-radius: 8px;
+    border-left: 4px solid #ef4444;
+    margin: 1rem 0;
+}
+
+.close-delete {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    position: absolute;
+    right: 1rem;
+    top: 1rem;
+    cursor: pointer;
+}
+
+.close-delete:hover,
+.close-delete:focus {
+    color: #333;
+}
+
+#modalTitle {
+    color: #4f46e5;
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+/* 重複記錄警告樣式 */
+.manage-leave-item.has-conflicts {
+    border-left: 4px solid #dc2626;
+    background: linear-gradient(135deg, #fef2f2 0%, #ffffff 100%);
+}
+
+.manage-leave-item.has-conflicts:hover {
+    background: linear-gradient(135deg, #fee2e2 0%, #f9fafb 100%);
+    box-shadow: 0 4px 15px rgba(220, 38, 38, 0.2);
+}
+
+/* 響應式設計 */
+@media (max-width: 768px) {
+    header {
+        padding: 1rem;
+    }
+    
+    .header-top {
+        flex-direction: column;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .language-switcher {
+        order: 1;
+    }
+
+    nav {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .nav-btn {
+        flex: 1;
+        min-width: 120px;
+    }
+
+    .calendar-grid {
+        font-size: 0.8rem;
+    }
+
+    .calendar-day {
+        padding: 0.5rem;
+        min-height: 80px;
+    }
+
+    .legend {
+        justify-content: center;
+    }
+
+    .form-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .submit-btn,
+    .reset-btn {
+        width: 100%;
+        max-width: 200px;
+    }
+}
+
+@media (max-width: 480px) {
+    main {
+        padding: 0 1rem;
+    }
+
+    .view {
+        padding: 1rem;
+        border-radius: 15px;
+    }
+    
+    .header-top {
+        text-align: center;
+    }
+    
+    .header-top h1 {
+        font-size: 1.4rem;
+    }
+    
+    .lang-btn {
+        font-size: 0.8rem;
+        padding: 0.4rem 0.8rem;
+        min-width: 50px;
+    }
+
+    .calendar-day {
+        min-height: 60px;
+        padding: 0.3rem;
+    }
+
+    .day-number {
+        font-size: 0.9rem;
+    }
+
+    .leave-item {
+        font-size: 0.6rem;
+        padding: 0.1rem 0.3rem;
+    }
+}
