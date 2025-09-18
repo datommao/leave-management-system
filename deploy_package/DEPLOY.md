@@ -92,19 +92,15 @@ git push -u origin main
    Branch: main
    Runtime: Python 3
    Build Command: pip install -r requirements.txt
-   Start Command: python cloud_server.py
+   Start Command: python app.py
    ```
 
-4. **環境變數設定**
-   - 點擊 "Advanced" 
-   - 新增環境變數：
-     ```
-     PORT = 10000
-     HOST = 0.0.0.0
-     ```
+4. **⚠️ 重要：不要設定環境變數**
+   - Render 會自動設定 PORT
+   - 讓系統自動處理即可
 
 5. **選擇方案**
-   - 選擇 **"Free"** 方案
+   - 選擇 **"Free"** 方案  
    - 點擊 "Create Web Service"
 
 ### **步驟 4：部署完成！**
